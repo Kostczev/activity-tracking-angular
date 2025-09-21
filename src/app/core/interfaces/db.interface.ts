@@ -7,7 +7,7 @@ export interface Cluster {
 export interface Activity {
     id?: number;
     name: string;
-    clusterId: string;
+    clusterId: number;
     color?: string;
     icon?: string;
     isActive: boolean;

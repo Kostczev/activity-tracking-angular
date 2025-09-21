@@ -1,7 +1,7 @@
 import { TimeSlot, Activity, Cluster } from './../interfaces/db.interface';
 import { db } from '../db';
 import { Injectable } from '@angular/core';
-import { liveQuery } from 'dexie';
+import Dexie, { EntityTable, liveQuery } from 'dexie';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -28,13 +28,37 @@ export class DataService {
         )
     }
 
+    // пытался реализовать обретку от дублировния кода ниже, но без any она работать ни в какую н езахотела
+    // конфликт типов table EntityTable<T, 'id'> и Omit<T, 'id'>
+    // моих знаний на как починить не хватило
+    // private async addWithIdCheck(
+    //     item: any, 
+    //     table: any, 
+    //     entityName: string
+    // ): Promise<number> {
+    //     const newId = await table.add(item);
+    //     if (newId === undefined) {
+    //         throw new Error(`Ошибка базы данных: не удалось добавить ${entityName}, ID не получен.`);
+    //     }
+    //     return newId;
+    // }
+    // return this.addWithIdCheck(activity, db.activities, 'активность')
+
     // метод принимает объект, где id ТОЧНО НЕ ДОЛЖНО быть
-    async addActivity(activity: Omit<Activity, 'id'>): Promise<number | undefined> {
-        return await db.activities.add(activity);
+    async addActivity(activity: Omit<Activity, 'id'>): Promise<number> {
+        const newId = await db.activities.add(activity)
+        if (newId === undefined) {
+            throw new Error('Ошибка базы данных: не удалось добавить кластер, ID не получен.');
+        }
+        return newId
     }
 
-    async addCluster(cluster: Omit<Cluster, 'id'>): Promise<number | undefined> {
-        return await db.clusters.add(cluster);
+    async addCluster(cluster: Omit<Cluster, 'id'>): Promise<number> {
+        const newId = await db.clusters.add(cluster)
+        if (newId === undefined) {
+            throw new Error('Ошибка базы данных: не удалось добавить кластер, ID не получен.');
+        }
+        return newId
     }
 
     async updateActivity(activity: Activity): Promise<void> {
