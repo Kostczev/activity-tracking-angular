@@ -6,7 +6,7 @@ import { Injectable } from "@angular/core";
 export class InitService {
     constructor(private dataService: DataService) { }
 
-    async initializApp(): Promise<boolean> {
+    async initializeApp(): Promise<boolean> {
         const hasData = await this.checkDbHasData()
 
         if (hasData) return false
@@ -22,47 +22,47 @@ export class InitService {
 
     private async createDefaultData(): Promise<void> {
         // Создаем кластеры и сразу получаем их ID
-        const workId = await this.dataService.addCluster({ name: 'Работа', isActive: true });
-        const restId = await this.dataService.addCluster({ name: 'Отдых', isActive: true });
-        const physicalId = await this.dataService.addCluster({ name: 'ФизАктивность', isActive: true });
-        const healthId = await this.dataService.addCluster({ name: 'Здоровье', isActive: true });
-        const learnId = await this.dataService.addCluster({ name: 'Обучение', isActive: true });
-        const lifeId = await this.dataService.addCluster({ name: 'Быт', isActive: true });
+        const workId = await this.dataService.addCluster({ name: 'Работа', isActive: 1 });
+        const restId = await this.dataService.addCluster({ name: 'Отдых', isActive: 1 });
+        const physicalId = await this.dataService.addCluster({ name: 'ФизАктивность', isActive: 1 });
+        const healthId = await this.dataService.addCluster({ name: 'Здоровье', isActive: 1 });
+        const learnId = await this.dataService.addCluster({ name: 'Обучение', isActive: 1 });
+        const lifeId = await this.dataService.addCluster({ name: 'Быт', isActive: 1 });
 
         // Массив активностей для массового добавления
         const activitiesToAdd = [
             // Работа
-            { name: 'Планирование', clusterId: workId, isActive: true },
-            { name: 'Совещание', clusterId: workId, isActive: true },
-            { name: 'Кодинг', clusterId: workId, isActive: true },
-            { name: 'Дизайн', clusterId: workId, isActive: true },
+            { name: 'Планирование', clusterId: workId, isActive: 1 },
+            { name: 'Совещание', clusterId: workId, isActive: 1 },
+            { name: 'Кодинг', clusterId: workId, isActive: 1 },
+            { name: 'Дизайн', clusterId: workId, isActive: 1 },
 
             // Отдых
-            { name: 'Сон', clusterId: restId, isActive: true },
-            { name: 'Просмотр контента', clusterId: restId, isActive: true },
-            { name: 'Соцсети', clusterId: restId, isActive: true },
-            { name: 'Ничегонеделание', clusterId: restId, isActive: true },
+            { name: 'Сон', clusterId: restId, isActive: 1 },
+            { name: 'Просмотр контента', clusterId: restId, isActive: 1 },
+            { name: 'Соцсети', clusterId: restId, isActive: 1 },
+            { name: 'Ничегонеделание', clusterId: restId, isActive: 1 },
 
             // ФизАктивность
-            { name: 'Зарядка', clusterId: physicalId, isActive: true },
-            { name: 'Тренировка', clusterId: physicalId, isActive: true },
-            { name: 'Прогулка', clusterId: physicalId, isActive: true },
+            { name: 'Зарядка', clusterId: physicalId, isActive: 1 },
+            { name: 'Тренировка', clusterId: physicalId, isActive: 1 },
+            { name: 'Прогулка', clusterId: physicalId, isActive: 1 },
 
             // Здоровье
-            { name: 'Стоматолог', clusterId: healthId, isActive: true },
-            { name: 'Аптека', clusterId: healthId, isActive: true },
+            { name: 'Стоматолог', clusterId: healthId, isActive: 1 },
+            { name: 'Аптека', clusterId: healthId, isActive: 1 },
 
             // Обучение
-            { name: 'Чтение', clusterId: learnId, isActive: true },
-            { name: 'Курсы', clusterId: learnId, isActive: true },
-            { name: 'Английский', clusterId: learnId, isActive: true },
-            { name: 'Пет-проект', clusterId: learnId, isActive: true },
+            { name: 'Чтение', clusterId: learnId, isActive: 1 },
+            { name: 'Курсы', clusterId: learnId, isActive: 1 },
+            { name: 'Английский', clusterId: learnId, isActive: 1 },
+            { name: 'Пет-проект', clusterId: learnId, isActive: 1 },
 
             // Быт
-            { name: 'Покупки', clusterId: lifeId, isActive: true },
-            { name: 'Уборка', clusterId: lifeId, isActive: true },
-            { name: 'Стирка', clusterId: lifeId, isActive: true },
-            { name: 'Готовка', clusterId: lifeId, isActive: true },
+            { name: 'Покупки', clusterId: lifeId, isActive: 1 },
+            { name: 'Уборка', clusterId: lifeId, isActive: 1 },
+            { name: 'Стирка', clusterId: lifeId, isActive: 1 },
+            { name: 'Готовка', clusterId: lifeId, isActive: 1 },
         ];
 
         // Добавляем все активности в базу

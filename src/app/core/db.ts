@@ -1,4 +1,4 @@
-import { Dexie, EntityTable } from './../../../node_modules/dexie/dist/dexie.d';
+import { Dexie, EntityTable } from 'dexie';
 import { Activity, Cluster, TimeSlot } from './interfaces/db.interface';
 
 
@@ -34,3 +34,5 @@ export class TimeTrackerDB extends Dexie {
 // Создаем экземпляр нашей БД. Это СИНГЛТОН
 // Создаем здесь и экспортируем, чтобы любой сервис или компонент мог импортировать и использовать его сразу
 export const db = new TimeTrackerDB();
+
+

@@ -1,7 +1,7 @@
 export interface Cluster {
     id?: number;
     name: string;
-    isActive: boolean;
+    isActive: number;
 }
 
 export interface Activity {
@@ -10,12 +10,12 @@ export interface Activity {
     clusterId: number;
     color?: string;
     icon?: string;
-    isActive: boolean;
+    isActive: number;
 }
 
 export interface TimeSlot {
     id?: number;
-    activityId: string;
+    activityId: number;
     startTime: Date;
     endTime: Date | null
 }

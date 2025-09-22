@@ -2,7 +2,7 @@ import { TimeSlot, Activity, Cluster } from './../interfaces/db.interface';
 import { db } from '../db';
 import { Injectable } from '@angular/core';
 import Dexie, { EntityTable, liveQuery } from 'dexie';
-import { Observable } from 'rxjs';
+import { catchError, from, map, Observable, of } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
@@ -18,14 +18,57 @@ export class DataService {
         });
     }
 
-    async addTimeSlot(slot: Omit<TimeSlot, 'id'>): Promise<void> {
-        await db.timeSlots.add(slot as TimeSlot);
+    async addTimeSlot(slot: Omit<TimeSlot, 'id'>): Promise<number> {
+        console.log('📝 Adding TimeSlot to DB:', slot);
+        const newId = await db.timeSlots.add(slot)
+        if (newId === undefined) {
+            throw new Error('Ошибка базы данных: не удалось добавить кластер, ID не получен.');
+        }
+
+        console.log('➡️ Added with ID:', newId);
+        return newId
+    }
+
+    async stopTimeSlot(timeSlotId: number): Promise<void> {
+        console.log('📝 Updating TimeSlot in DB:', timeSlotId);
+
+        const updatedCount = await db.timeSlots.update(timeSlotId, {
+            endTime: new Date()
+        });
+
+        console.log('✅ Updated records count:', updatedCount);
+
+        if (updatedCount === 0) {
+            console.error('❌ No record found with ID:', timeSlotId);
+        }
+    }
+
+    getLastTimeSlot(): Observable<TimeSlot | null> {
+        return from(db.timeSlots.orderBy('id').reverse().first()).pipe(
+            map(timeSlot => timeSlot || null),
+            catchError(error => of(null))
+        );
     }
 
     getAllTimeSlots(): Observable<TimeSlot[]> {
         return this.wrapLiveQuery(
             () => db.timeSlots.toArray()
         )
+    }
+
+    getActivitiesByClusterId(clusterId: number): Observable<Activity[]> {
+        return this.wrapLiveQuery(() =>
+            db.activities
+                .where('clusterId')
+                .equals(clusterId)
+                .and(activity => activity.isActive === 1)
+                .toArray()
+        );
+    }
+    getAllActiveClusters(): Observable<Cluster[]> {
+        return this.wrapLiveQuery(() =>
+            db.clusters.where('isActive').equals(1).toArray()
+        );
     }
 
     // пытался реализовать обретку от дублировния кода ниже, но без any она работать ни в какую н езахотела
@@ -75,11 +118,11 @@ export class DataService {
     }
 
     async deactivateActivity(activityId: number): Promise<void> {
-        await db.activities.update(activityId, { isActive: false });
+        await db.activities.update(activityId, { isActive: 0 });
     }
 
     async activateActivity(activityId: number): Promise<void> {
-        await db.activities.update(activityId, { isActive: true });
+        await db.activities.update(activityId, { isActive: 1 });
     }
 
     async permanentlyDeleteActivity(activityId: number): Promise<{ success: boolean; message: string }> {
@@ -105,5 +148,11 @@ export class DataService {
         return this.wrapLiveQuery(() =>
             db.activities.where('isActive').equals(1).toArray()
         )
+    }
+
+    async debugActivities() {
+        const allActivities = await db.activities.toArray();
+        console.log('Все активности в базе:', allActivities);
+        return allActivities;
     }
 }

@@ -1,4 +1,5 @@
-import { Component, signal } from '@angular/core';
+import { InitService } from './core/services/init.service';
+import { Component, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -7,6 +8,23 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App {
+export class App implements OnInit {
   protected readonly title = signal('activity-tracking-angular');
+
+  constructor(private initService: InitService) {} // Инжектим сервис
+
+  async ngOnInit() {
+    console.log('🟡 AppComponent: запуск инициализации');
+    
+    try {
+      const initialized = await this.initService.initializeApp();
+      if (initialized) {
+        console.log('✅ Приложение инициализировано с стартовыми данными');
+      } else {
+        console.log('ℹ️ База уже была инициализирована ранее');
+      }
+    } catch (error) {
+      console.error('❌ Ошибка инициализации приложения:', error);
+    }
+  }
 }

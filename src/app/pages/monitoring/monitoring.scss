@@ -1,0 +1,16 @@
+.activities-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+}
+
+.activity-button {
+    background: var(--aquamarine-transparency-color);
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &.active {
+        background: var(--aquamarine-color);
+    }
+}

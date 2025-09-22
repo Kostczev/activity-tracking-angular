@@ -1,1 +1,17 @@
-<p>monitoring works!</p>
+<h2 class="h2 mb24">Занятия</h2>
+<div class="">
+    @for (group of clustersWithActivities(); track group.cluster.id) {
+    <div class="cluster-group">
+        <h3 class="h3 mb20">{{ group.cluster.name }}</h3>
+        <div class="activities-wrapper mb24">
+            @for (activity of group.activities; track activity.id) {
+            <button class="activity-button" [class.active]="currentActivityId === activity.id" (click)="onActivityClick(activity.id!)">
+                {{ activity.name }}
+            </button>
+            }
+        </div>
+    </div>
+    }@empty {
+        <p>Нет активных активностей</p>
+    }
+</div>
