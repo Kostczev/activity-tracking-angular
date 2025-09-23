@@ -1,11 +1,12 @@
 import { InitService } from './core/services/init.service';
 import { Component, OnInit, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { CurrentTimer } from "./common-ui/current-timer/current-timer";
+import { RouterOutlet } from '@angular/router';
+import { CurrentTimer } from "./ui/current-timer/current-timer";
+import { Header } from "./ui/header/header";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CurrentTimer, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, CurrentTimer, Header],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

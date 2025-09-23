@@ -1,0 +1,130 @@
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: -1;
+        background: rgba(0, 0, 0, 0.85);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
+
+    &.mobile::before {
+        animation-name: fixing_the_glass_problem_in_Chrome;
+        animation-duration: 2s;
+        animation-iteration-count: infinite;
+    }
+
+
+    &__nav {
+        margin: 12px 0;
+        display: grid;
+        justify-content: space-between;
+        grid-template: "logo nav";
+
+        .mobile & {
+            grid-template: "logo burger"
+                "nav nav";
+            transition: grid-template-rows 0.3s ease;
+            grid-template-rows: auto 0fr;
+        }
+
+        .mobile &.active {
+            grid-template-rows: auto 1fr;
+        }
+    }
+
+
+    &__logo {
+        grid-area: logo;
+        line-height: 48px;
+    }
+
+    &__burger {
+        grid-area: burger;
+        height: 48px;
+        width: 48px;
+        position: relative;
+
+        &-icon {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            color: var(--aquamarine-color);
+        }
+
+        &-line {
+            transition: 0.3s all ease;
+        }
+
+        &.active {
+            .header__burger-line.top {
+                transform: rotate(45deg) translate(5px, -6px);
+            }
+
+            .header__burger-line.middle {
+                opacity: 0;
+            }
+
+            .header__burger-line.bottom {
+                transform: rotate(-45deg) translate(-12px, -1px);
+            }
+        }
+    }
+
+    &__links-wrapper {
+        grid-area: nav;
+        display: flex;
+        align-items: center;
+
+        .mobile & {
+            min-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transition: all .3s ease;
+            flex-direction: column;
+            align-items: start;
+            gap: 12px;
+        }
+
+        .mobile .active & {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+    }
+
+    &__link {
+        padding: 8px;
+    }
+}
+
+@keyframes fixing_the_glass_problem_in_Chrome {
+
+    /*Хром игнорирует блюр у разварачиваемого объекта*/
+    0% {
+        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(5px);
+    }
+
+    50% {
+        -webkit-backdrop-filter: blur(5.1px);
+        backdrop-filter: blur(5.1px);
+    }
+
+    100% {
+        -webkit-backdrop-filter: blur(5px);
+        backdrop-filter: blur(5px);
+    }
+}

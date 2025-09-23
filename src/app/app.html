@@ -1,18 +1,6 @@
-<nav class="navbar">
-  <ul class="nav-container">
-    <li>
-      <a routerLink="/monitoring" routerLinkActive="active">Мониторинг</a>
-    </li>
-    <li>
-      <a routerLink="/statistics" routerLinkActive="active">Статистика</a>
-    </li>
-    <li>
-      <a routerLink="/edit" routerLinkActive="active">Редактор</a>
-    </li>
-  </ul>
-</nav>
+<app-header></app-header>
 
-<main class="main-content">
+<main class="main-content wrap-width">
   <router-outlet></router-outlet>
   <app-current-timer></app-current-timer>
 </main>

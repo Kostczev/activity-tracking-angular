@@ -1,0 +1,34 @@
+<header class="header" [class.mobile]="isMobile()">
+    <nav class="header__nav wrap-width" [class.active]="isMenuOpen()">
+        <div class="header__logo">MyApp</div>
+        @if (isMobile()) {
+        <button class="header__burger" (click)="toggleMenu()" [class.active]="isMenuOpen()">
+            <svg class="header__burger-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path class="header__burger-line top" d="M2 6h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path class="header__burger-line middle" d="M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path class="header__burger-line bottom" d="M2 18h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+        }
+        <ul class="header__links-wrapper">
+            <li class="header__link-item">
+                <a class="header__link link text-regular" routerLink="/monitoring" routerLinkActive="active"
+                    (click)="closeMenuOnMobile()">
+                    Мониторинг
+                </a>
+            </li>
+            <li class="header__link-item">
+                <a class="header__link link text-regular" routerLink="/statistics" routerLinkActive="active"
+                    (click)="closeMenuOnMobile()">
+                    Статистика
+                </a>
+            </li>
+            <li class="header__link-item">
+                <a class="header__link link text-regular" routerLink="/edit" routerLinkActive="active"
+                    (click)="closeMenuOnMobile()">
+                    Редактор
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
