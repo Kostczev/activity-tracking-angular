@@ -11,12 +11,9 @@ import { TimeTrackerService } from '../../core/services/time-tracker.service';
   templateUrl: './monitoring.html',
   styleUrl: './monitoring.scss'
 })
-export class MonitoringComponent implements OnInit, OnDestroy {
+export class MonitoringComponent implements OnInit {
   activities$?: Observable<Activity[]>
-  currentActivity$: Observable<number | null> = of(null)
-  currentActivityId: number | null = null
-  currentTimeSlotId: number | null = null
-  private subscription?: Subscription;
+  currentActivityId$: Observable<number | null>
 
   clustersWithActivities = signal<{ cluster: Cluster; activities: Activity[] }[]>([]);
 
@@ -25,20 +22,11 @@ export class MonitoringComponent implements OnInit, OnDestroy {
     private timeTracker: TimeTrackerService
   ) {
     this.activities$ = this.dataService.getAllActiveActivities()
-    this.currentActivity$ = this.timeTracker.loadCurrentActivity()
+    this.currentActivityId$ = this.timeTracker.currentActivityId$
   }
 
   ngOnInit(): void {
-    this.dataService.debugActivities()
     this.loadActivitiesByClusters()
-
-    this.subscription = this.currentActivity$.subscribe(activityId => {
-      this.currentActivityId = activityId;
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.subscription?.unsubscribe();
   }
 
   async loadActivitiesByClusters() {
@@ -59,30 +47,20 @@ export class MonitoringComponent implements OnInit, OnDestroy {
 
 
 
-  async onActivityClick(activityId: number) {
-    // Сохраняем предыдущее значение
-    const previousActivityId = this.currentActivityId;
-    // обновляем состояние для UI
-    this.currentActivityId = activityId;
+  async onActivityClick(activity: Activity) {
+    const currentActivityId = await firstValueFrom(this.currentActivityId$);
 
-    // Если нажали на уже активную кнопку - завершаем
-    if (previousActivityId && previousActivityId === activityId) {
-      this.currentActivityId = null;
+    // смотрим был ли клик по активной
+    if (currentActivityId === activity.id) {
       await this.timeTracker.stopCurrentActivity();
-      return;
+    } else {
+      // если уже что-то включено - выключаем
+      if (currentActivityId) {
+        await this.timeTracker.stopCurrentActivity();
+      }
+      // Запускаем новую
+      await this.timeTracker.startActivity(activity);
     }
-
-    // Если есть другая активная активность - останавливаем её
-    if (previousActivityId) {
-      await this.timeTracker.stopCurrentActivity();
-    }
-
-    // Запускаем новую выбранную активность
-    await this.timeTracker.startActivity(activityId);
-  }
-
-  isActive(activityId: number): boolean {
-    return this.currentActivityId === activityId;
   }
 
   trackByActivityId(index: number, activity: Activity): number {

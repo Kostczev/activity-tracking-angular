@@ -5,7 +5,7 @@
         <h3 class="h3 mb20">{{ group.cluster.name }}</h3>
         <div class="activities-wrapper mb24">
             @for (activity of group.activities; track activity.id) {
-            <button class="activity-button" [class.active]="currentActivityId === activity.id" (click)="onActivityClick(activity.id!)">
+            <button class="activity-button" [class.active]="(currentActivityId$ | async) === activity.id" (click)="onActivityClick(activity)">
                 {{ activity.name }}
             </button>
             }

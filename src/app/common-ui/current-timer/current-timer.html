@@ -1,0 +1,6 @@
+@if (currentActivityName$ | async; as name) {
+<div>
+    {{ name }}: {{ currentDuration$ | async }}
+    <button (click)="stopActivity()">Stop</button>
+</div>
+}

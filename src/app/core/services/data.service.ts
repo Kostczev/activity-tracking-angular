@@ -1,7 +1,7 @@
 import { TimeSlot, Activity, Cluster } from './../interfaces/db.interface';
 import { db } from '../db';
 import { Injectable } from '@angular/core';
-import Dexie, { EntityTable, liveQuery } from 'dexie';
+import { liveQuery } from 'dexie';
 import { catchError, from, map, Observable, of } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -56,6 +56,21 @@ export class DataService {
         )
     }
 
+    getActivityById(activityId: number): Observable<Activity | null> {
+        return this.wrapLiveQuery(() =>
+            db.activities
+                .where('id')
+                .equals(activityId)
+                .toArray()
+        ).pipe(
+            map(activities => activities?.[0] || null),
+            catchError(error => {
+                console.error('Error getting activity by ID:', error);
+                return of(null);
+            })
+        );
+    }
+
     getActivitiesByClusterId(clusterId: number): Observable<Activity[]> {
         return this.wrapLiveQuery(() =>
             db.activities
@@ -70,22 +85,6 @@ export class DataService {
             db.clusters.where('isActive').equals(1).toArray()
         );
     }
-
-    // пытался реализовать обретку от дублировния кода ниже, но без any она работать ни в какую н езахотела
-    // конфликт типов table EntityTable<T, 'id'> и Omit<T, 'id'>
-    // моих знаний на как починить не хватило
-    // private async addWithIdCheck(
-    //     item: any, 
-    //     table: any, 
-    //     entityName: string
-    // ): Promise<number> {
-    //     const newId = await table.add(item);
-    //     if (newId === undefined) {
-    //         throw new Error(`Ошибка базы данных: не удалось добавить ${entityName}, ID не получен.`);
-    //     }
-    //     return newId;
-    // }
-    // return this.addWithIdCheck(activity, db.activities, 'активность')
 
     // метод принимает объект, где id ТОЧНО НЕ ДОЛЖНО быть
     async addActivity(activity: Omit<Activity, 'id'>): Promise<number> {
