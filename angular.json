@@ -81,7 +81,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/404.html"
             ],
             "styles": [
               "src/app/styles/styles.scss"
