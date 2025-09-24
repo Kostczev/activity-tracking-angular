@@ -1,6 +1,12 @@
+@if (isInitialized()) {
 <app-header></app-header>
 
 <main class="main-content wrap-width">
   <router-outlet></router-outlet>
   <app-current-timer></app-current-timer>
 </main>
+} @else {
+<div class="loading">
+  <p>Загрузка приложения...</p>
+</div>
+}

@@ -26,7 +26,6 @@
 
 
     &__nav {
-        margin: 12px 0;
         display: grid;
         justify-content: space-between;
         grid-template: "logo nav";
@@ -88,14 +87,14 @@
         align-items: center;
 
         .mobile & {
-            min-height: 0;
+            margin: 16px 0;
             overflow: hidden;
             opacity: 0;
             pointer-events: none;
             transition: all .3s ease;
             flex-direction: column;
             align-items: start;
-            gap: 12px;
+            gap: 20px;
         }
 
         .mobile .active & {

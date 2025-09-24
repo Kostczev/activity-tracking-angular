@@ -12,6 +12,7 @@ import { Header } from "./ui/header/header";
 })
 export class App implements OnInit {
   protected readonly title = signal('activity-tracking-angular');
+  protected readonly isInitialized = signal(false);
 
   constructor(private initService: InitService) {} // Инжектим сервис
 
@@ -27,6 +28,10 @@ export class App implements OnInit {
       }
     } catch (error) {
       console.error('❌ Ошибка инициализации приложения:', error);
+    } finally {
+      // ВЛЮЧАЕМ отображение приложения независимо от результата
+      this.isInitialized.set(true);
+      console.log('🚀 Приложение готово к работе');
     }
   }
 }
