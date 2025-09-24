@@ -10,4 +10,14 @@
 <body>
   <app-root></app-root>
 </body>
+<script>
+    // Редирект для GitHub Pages
+    (function() {
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        if (isGitHubPages && window.location.pathname !== '/activity-tracking-angular/') {
+            const newPath = '/activity-tracking-angular' + window.location.pathname + window.location.search;
+            window.history.replaceState({}, '', newPath);
+        }
+    })();
+</script>
 </html>
