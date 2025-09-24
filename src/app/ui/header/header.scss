@@ -87,7 +87,7 @@
         align-items: center;
 
         .mobile & {
-            margin: 16px 0;
+            // margin: 16px 0;
             overflow: hidden;
             opacity: 0;
             pointer-events: none;
@@ -102,6 +102,15 @@
             pointer-events: all;
         }
 
+    }
+
+    &__link-item {
+        &:first-child {
+            margin-top: 16px;
+        }
+        &:last-child {
+            margin-bottom: 16px;
+        }
     }
 
     &__link {
