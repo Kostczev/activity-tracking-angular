@@ -1,11 +1,21 @@
-import { TimeSlot, Activity, Cluster } from './../interfaces/db.interface';
+import { DateFormatService } from './date-format.service';
+import { TimeSlot, Activity, Cluster, StatisticSlot } from './../interfaces/db.interface';
 import { db } from '../db';
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { liveQuery } from 'dexie';
-import { catchError, from, map, Observable, of } from 'rxjs';
+import { catchError, forkJoin, from, map, Observable, of, shareReplay, switchMap, take, tap } from 'rxjs';
+import { Data } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
+    clustersCache = new Map<number, Cluster>();
+    private clustersLoaded = false;
+
+    constructor() {
+        this.preloadClusters().subscribe();
+    }
+
     // Приватный метод-обертка для всех liveQuery
     private wrapLiveQuery<T>(queryFn: () => Promise<T[]>): Observable<T[]> {
         return new Observable<T[]>(subscriber => {
@@ -19,24 +29,17 @@ export class DataService {
     }
 
     async addTimeSlot(slot: Omit<TimeSlot, 'id'>): Promise<number> {
-        console.log('📝 Adding TimeSlot to DB:', slot);
         const newId = await db.timeSlots.add(slot)
         if (newId === undefined) {
             throw new Error('Ошибка базы данных: не удалось добавить кластер, ID не получен.');
         }
-
-        console.log('➡️ Added with ID:', newId);
         return newId
     }
 
     async stopTimeSlot(timeSlotId: number): Promise<void> {
-        console.log('📝 Updating TimeSlot in DB:', timeSlotId);
-
         const updatedCount = await db.timeSlots.update(timeSlotId, {
             endTime: new Date()
         });
-
-        console.log('✅ Updated records count:', updatedCount);
 
         if (updatedCount === 0) {
             console.error('❌ No record found with ID:', timeSlotId);
@@ -56,19 +59,58 @@ export class DataService {
         )
     }
 
-    getActivityById(activityId: number): Observable<Activity | null> {
+    getActivityById(activityId: number): Observable<Activity> {
         return this.wrapLiveQuery(() =>
             db.activities
                 .where('id')
                 .equals(activityId)
                 .toArray()
         ).pipe(
-            map(activities => activities?.[0] || null),
-            catchError(error => {
-                console.error('Error getting activity by ID:', error);
-                return of(null);
+            map(activities => activities[0])
+        );
+    }
+
+    // Основной метод для получения кластера
+    getClusterById(clusterId: number): Observable<Cluster | null> {
+        // Если уже загружены - возвращаем из кеша
+        if (this.clustersLoaded) {
+            return of(this.clustersCache.get(clusterId) || null);
+        }
+
+        // Если еще не загружали - загружаем все и кешируем
+        return this.getAllClusters().pipe(
+            tap(clusters => this.cacheClusters(clusters)),
+            map(() => this.clustersCache.get(clusterId) || null)
+        );
+    }
+
+    preloadClusters(): Observable<Cluster[]> {
+        return this.getAllClusters().pipe(
+            tap(clusters => {
+                clusters.forEach(cluster => {
+                    if (cluster.id) {
+                        this.clustersCache.set(cluster.id, cluster);
+                    }
+                });
             })
         );
+    }
+
+    getAllClusters(): Observable<Cluster[]> {
+        return this.wrapLiveQuery(() => db.clusters.toArray());
+    }
+
+    private cacheClusters(clusters: Cluster[]): void {
+        clusters.forEach(cluster => {
+            if (cluster.id) {
+                this.clustersCache.set(cluster.id, cluster);
+            }
+        });
+    }
+
+    // Вспомогательный метод для быстрого доступа
+    getClusterName(clusterId: number): string {
+        return this.clustersCache.get(clusterId)?.name || 'Unknown';
     }
 
     getActivitiesByClusterId(clusterId: number): Observable<Activity[]> {
@@ -110,12 +152,6 @@ export class DataService {
         await db.activities.update(activity.id, activity);
     }
 
-    getAllClusters(): Observable<Cluster[]> {
-        return this.wrapLiveQuery(
-            () => db.clusters.toArray()
-        );
-    }
-
     async deactivateActivity(activityId: number): Promise<void> {
         await db.activities.update(activityId, { isActive: 0 });
     }
@@ -151,7 +187,63 @@ export class DataService {
 
     async debugActivities() {
         const allActivities = await db.activities.toArray();
-        console.log('Все активности в базе:', allActivities);
         return allActivities;
+    }
+
+    getTimeSlotsForPeriod(startDate: Date, endDate: Date): Observable<TimeSlot[]> {
+        const startOfDay = new Date(startDate);
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const endOfDay = new Date(endDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        return this.wrapLiveQuery(() =>
+            db.timeSlots
+                .where('endTime')
+                .between(startOfDay, endOfDay)
+                .toArray()
+        )
+    }
+
+    getStatistic(startDate: Date, endDate: Date): Observable<StatisticSlot[]> {
+        return this.getTimeSlotsForPeriod(startDate, endDate).pipe(
+            switchMap(slots => this.enrichSlotsWithActivities(slots))
+        );
+    }
+
+    private enrichSlotsWithActivities(slots: TimeSlot[]): Observable<StatisticSlot[]> {
+        // Группируем запросы по активности для оптимизации
+        const activityRequests = new Map<number, Observable<Activity>>();
+        const clusterRequests = new Map<number, Observable<Cluster>>();
+
+        const slotRequests = slots.map(slot => {
+            if (!activityRequests.has(slot.activityId)) {
+                activityRequests.set(slot.activityId, this.getActivityById(slot.activityId));
+            }
+
+            return activityRequests.get(slot.activityId)!.pipe(
+                // getActivityById() возвращает Observable который не завершается автоматически после первого значения
+                // forkJoin ждет завершения ВСЕХ Observable'ов в массиве.
+                // Добавьте take(1) - это гарантирует, что каждый Observable эмитнет значение и завершится
+                take(1),
+                map(activity => ({
+                    timeSlotId: slot.id!,
+                    activityId: slot.activityId,
+                    activityName: activity?.name || 'Unknown',
+                    clusterId: activity?.clusterId || -1,
+                    startTime: slot.startTime,
+                    endTime: slot.endTime,
+                    duration: this.calculateSlotDuration(slot)
+                }))
+            );
+        });
+
+        return forkJoin(slotRequests);
+    }
+
+    calculateSlotDuration(slot: TimeSlot): number {
+        return slot.endTime
+            ? new Date(slot.endTime).getTime() - new Date(slot.startTime).getTime()
+            : 0;
     }
 }

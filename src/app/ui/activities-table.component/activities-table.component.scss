@@ -1,0 +1,83 @@
+.activities-table {
+
+    &__header {
+        grid-template-columns: 120px 1fr 100px 100px 68px;
+    }
+
+    &__body {
+    }
+    &__row {
+        grid-template-columns: 120px 1fr 100px 100px 68px;
+    }
+}
+
+// 768px
+@media (max-width: 1023px) {
+    .activities-table {
+        &__header {
+            display: none;
+        }
+        
+        &__body {
+            display: flex;
+            flex-direction: column;
+            // gap: 20px;
+        }
+        
+        &__row {
+            padding: 16px;
+            display: grid;
+            grid-template-columns: unset;
+            grid-template-areas: 
+                "activity activity activity"
+                "cluster cluster cluster"
+                "start end duration"
+                ;
+            gap: 8px;
+        }
+        
+        .activities-table__col {
+            &--activity {
+                grid-area: activity;
+                font-weight: 600;
+                font-size: 16px;
+            }
+            
+            &--cluster {
+                grid-area: cluster;
+                font-size: 10px;
+                line-height: 10px;
+            }
+            
+            &--start {
+                grid-area: start;
+                
+                &::before {
+                    content: "С: ";
+                    color: #aaa;
+                    font-size: 12px;
+                }
+            }
+            
+            &--end {
+                grid-area: end;
+                &::before {
+                    content: "По: ";
+                    color: #aaa;
+                    font-size: 12px;
+                }
+            }
+            
+            &--duration {
+                grid-area: duration;
+                text-align: right;
+                
+                &::before {
+                    content: "Длит: ";
+                    color: #aaa;
+                    font-size: 12px;
+                }
+            }
+        }
+    }
+}

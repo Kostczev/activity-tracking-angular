@@ -2,6 +2,7 @@ import { DataService } from './data.service';
 import { Injectable } from '@angular/core';
 import { Activity, TimeSlot } from '../interfaces/db.interface';
 import { BehaviorSubject, filter, firstValueFrom, interval, map, Observable, of, switchMap } from 'rxjs';
+import { DateFormatService } from './date-format.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,10 @@ export class TimeTrackerService {
 
   currentTimeSlotId: number | null = null
 
-  constructor(private dataService: DataService) {
+  constructor(
+    private dataService: DataService,
+    private dateFormatService: DateFormatService
+  ) {
     this.loadCurrentActivity()
   }
 
@@ -121,14 +125,6 @@ export class TimeTrackerService {
     const now = new Date();
     const diffMs = now.getTime() - startTime.getTime();
 
-    return this.formatDuration(diffMs);
-  }
-
-  private formatDuration(ms: number): string {
-    const seconds = Math.floor(ms / 1000) % 60;
-    const minutes = Math.floor(ms / (1000 * 60)) % 60;
-    const hours = Math.floor(ms / (1000 * 60 * 60));
-
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    return this.dateFormatService.formatDuration(diffMs);
   }
 }

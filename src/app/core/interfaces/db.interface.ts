@@ -17,5 +17,15 @@ export interface TimeSlot {
     id?: number;
     activityId: number;
     startTime: Date;
-    endTime: Date | null
+    endTime: Date | null;
+}
+
+export interface StatisticSlot {
+    timeSlotId: number;
+    activityId: number;
+    activityName: string;
+    clusterId: number;
+    startTime: Date;
+    endTime: Date | null;
+    duration: number;
 }

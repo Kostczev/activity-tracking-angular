@@ -1,0 +1,35 @@
+<div class="activities-table table">
+    <div class="table__header activities-table__header">
+        <div class="activities-table__col--cluster">Кластер</div>
+        <div class="activities-table__col--activity">Активность</div>
+        <div class="activities-table__col--start">Начало</div>
+        <div class="activities-table__col--end">Конец</div>
+        <div class="activities-table__col--duration">Продолж</div>
+    </div>
+
+    <div class="table__body activities-table__body">
+        @for (slot of slots(); track slot.timeSlotId){
+        <div class="table__row activities-table__row">
+            <div class="activities-table__col--cluster">
+                {{ getClusterName(slot.clusterId) }}
+            </div>
+
+            <div class="activities-table__col--activity">
+                {{ slot.activityName }}
+            </div>
+
+            <div class="activities-table__col--start">
+                {{ slot.startTime | date:'HH:mm' }}
+            </div>
+
+            <div class="activities-table__col--end">
+                {{ slot.endTime | date:'HH:mm' }}
+            </div>
+
+            <div class="activities-table__col--duration">
+                {{ formatDuration(slot.duration) }}
+            </div>
+        </div>
+        }
+    </div>
+</div>

@@ -14,11 +14,11 @@ export class App implements OnInit {
   protected readonly title = signal('activity-tracking-angular');
   protected readonly isInitialized = signal(false);
 
-  constructor(private initService: InitService) {} // Инжектим сервис
+  constructor(private initService: InitService) { } // Инжектим сервис
 
   async ngOnInit() {
     console.log('🟡 AppComponent: запуск инициализации');
-    
+
     try {
       const initialized = await this.initService.initializeApp();
       if (initialized) {

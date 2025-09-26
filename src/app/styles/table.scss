@@ -1,0 +1,36 @@
+.table {
+    background: var(--dark-transparency-40-color);
+    border-radius: var(--midel-radius);
+    overflow: hidden;
+
+    &__header {
+        background: var(--dark-transparency-70-color);
+        font-weight: 600;
+        border-bottom: 1px solid var(--aquamarine-transparency-color);
+    }
+
+    &__header,
+    &__row {
+        padding: 24px;
+        display: grid;
+        gap: 12px;
+        font-size: 14px;
+        line-height: 16px;
+    }
+
+    &__body {}
+
+    &__row {
+        border-bottom: 1px solid var(--aquamarine-transparency-color);
+        align-items: center;
+        transition: background 0.2s ease;
+
+        &:hover {
+            background: var(--aquamarine-transparency-color);
+        }
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+}

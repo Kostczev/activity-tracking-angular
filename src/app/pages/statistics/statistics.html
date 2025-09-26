@@ -1,1 +1,20 @@
-<p>statistics works!</p>
+<h2 class="h2 mb24">Статистика</h2>
+<div class="mb60">
+    <div class="stats__wrapper">
+        @for (stat of todayStats$ | async; track stat.activityName) {
+        <div class="stats__card">
+            <div class="stats__name">{{ stat.activityName }}</div>
+            <div class="stats__duration">{{ stat.duration }}</div>
+            <div class="stats__bar">
+                <div class="stats__progress" [style.width.%]="getPercentageForDay(stat.durationMs)"></div>
+            </div>
+            <div class="stats__percentage">{{ getPercentageForDay(stat.durationMs) }}%</div>
+        </div>
+        }
+    </div>
+
+</div>
+<h3 class="h3 mb20">Детализация</h3>
+@if (statisticSlots$ | async; as statisticSlots) {
+    <app-activities-table-component [statisticSlots]="statisticSlots"></app-activities-table-component>
+}

@@ -1,0 +1,54 @@
+.stats {
+    &__wrapper {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    &__card {
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid var(--aquamarine-color);
+
+        display: grid;
+        grid-template-columns: minmax(116px, 1fr) 1fr;
+        column-gap: 28px;
+        grid-template-areas: "name bar"
+                       "duration percentage";
+    }
+
+    &__name {
+        grid-area: name;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+
+    &__duration {
+        grid-area: duration;
+        font-size: 24px;
+        font-weight: bold;
+        color:  var(--aquamarine-color);
+    }
+
+    &__bar {
+        grid-area: bar;
+        height: 8px;
+        background: var(--aquamarine-transparency-color);
+        border-radius: 4px;
+        margin: 0.5rem 0;
+    }
+
+    &__progress {
+        height: 100%;
+        background: var(--aquamarine-color);
+        border-radius: 4px;
+        transition: width 0.3s ease;
+    }
+
+    &__percentage {
+        grid-area: percentage;
+        font-size: 0.9rem;
+        color: #666;
+    }
+}

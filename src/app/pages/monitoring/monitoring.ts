@@ -37,7 +37,6 @@ export class MonitoringComponent implements OnInit {
         const activities = await firstValueFrom(
           this.dataService.getActivitiesByClusterId(cluster.id!)
         );
-        console.log(cluster, activities)
         return { cluster, activities };
       })
     );

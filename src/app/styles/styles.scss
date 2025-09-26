@@ -6,11 +6,13 @@
 @use 'svg';
 @use 'width';
 @use 'wrap';
+@use 'table';
 
 :root {
   --dark-color: #000000;
   --dark-active-color: #161616;
-  --dark-transparency-color: rgba(0, 0, 0, 0.7);
+  --dark-transparency-70-color: rgba(0, 0, 0, 0.7);
+  --dark-transparency-40-color: rgba(0, 0, 0, 0.4);
   --dark-hover-color: #161616;
   --light-color: #ffffff;
   --light-transparent-color: rgba(255, 255, 255, 0.8);
@@ -22,6 +24,10 @@
   --aquamarine-transparency-color: rgba(45, 212, 191, .1);
 
   --light-border: 1px solid var(--light-color);
+
+  --slow-radius: 4px;
+  --midel-radius: 8px;
+  --large-radius: 12px;
 }
 
 body {
