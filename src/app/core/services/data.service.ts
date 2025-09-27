@@ -191,17 +191,11 @@ export class DataService {
     }
 
     getTimeSlotsForPeriod(startDate: Date, endDate: Date): Observable<TimeSlot[]> {
-        // const startOfDay = new Date(startDate);
-        // startOfDay.setHours(0, 0, 0, 0);
-
-        // const endOfDay = new Date(endDate);
-        // endOfDay.setHours(23, 59, 59, 999);
 
         return this.wrapLiveQuery(() =>
             db.timeSlots
                 .where('endTime')
                 .between(startDate, endDate)
-                // .between(startOfDay, endOfDay)
                 .toArray()
         )
     }
@@ -265,29 +259,17 @@ export class DataService {
     } {
         const slotEnd = slot.endTime || new Date();
 
-        // Если таймслот не пересекается с периодом - возвращаем нулевую длительность
-        // if (slotEnd <= periodStart || slot.startTime >= periodEnd) {
-        //     return {
-        //         startTime: slot.startTime,
-        //         endTime: slotEnd,
-        //         duration: 0
-        //     };
-        // }
-
         // Обрезаем границы
         const trimmedStart = slot.startTime < periodStart ? periodStart : slot.startTime;
         const trimmedEnd = slotEnd > periodEnd ? periodEnd : slotEnd;
-
-        // const trimmedDuration = trimmedEnd.getTime() - trimmedStart.getTime();
+        
         const trimmedDuration = this.calculateDuration(trimmedStart, trimmedEnd)
 
         return {
             // startTime: slot.startTime,
             startTime: trimmedStart,
             endTime: slot.endTime!,
-            duration: this.calculateDuration(slot.startTime, slot.endTime!)
-            // endTime: trimmedEnd,
-            // duration: trimmedDuration
+            duration: trimmedDuration
         };
     }
 }

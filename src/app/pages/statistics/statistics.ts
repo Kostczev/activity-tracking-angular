@@ -66,6 +66,8 @@ export class StatisticsComponent {
       }));
   }
 
+  showDates = () => this.period > 1 ? true : false
+
   formatDuration = (duration: number) => this.dateFormatService.formatDuration(duration)
 
   getPercentageForDays = (duration: number) => this.dateFormatService.getPercentageForDays(duration, this.period)

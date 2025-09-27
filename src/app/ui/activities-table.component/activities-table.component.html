@@ -1,9 +1,11 @@
-<div class="activities-table table">
+<div class="activities-table table" [class.show-dates]="showDates()">
     <div class="table__header activities-table__header">
         <div class="activities-table__col--cluster">Кластер</div>
         <div class="activities-table__col--activity">Активность</div>
         <div class="activities-table__col--start">Начало</div>
+        <div class="activities-table__col--date"></div>
         <div class="activities-table__col--end">Конец</div>
+        <div class="activities-table__col--date"></div>
         <div class="activities-table__col--duration">Продолж</div>
     </div>
 
@@ -21,9 +23,15 @@
             <div class="activities-table__col--start">
                 {{ slot.startTime | date:'HH:mm' }}
             </div>
+            <div class="activities-table__col--date">
+                {{ slot.startTime | date:'dd.MM.yy' }}
+            </div>
 
             <div class="activities-table__col--end">
                 {{ slot.endTime | date:'HH:mm' }}
+            </div>
+            <div class="activities-table__col--date">
+                {{ slot.endTime | date:'dd.MM.yy' }}
             </div>
 
             <div class="activities-table__col--duration">

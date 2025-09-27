@@ -39,5 +39,5 @@
 </div>
 <h3 class="h3 mb20">Детализация</h3>
 @if (statisticSlots$ | async; as statisticSlots) {
-    <app-activities-table-component [statisticSlots]="statisticSlots"></app-activities-table-component>
+    <app-activities-table-component [statisticSlots]="statisticSlots" [showDates]="showDates()"></app-activities-table-component>
 }

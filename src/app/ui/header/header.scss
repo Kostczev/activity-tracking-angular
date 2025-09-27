@@ -104,6 +104,8 @@
     }
 
     .mobile &__link-item {
+        width: 100%;
+        
         &:first-child {
             margin-top: 16px;
         }
@@ -114,6 +116,10 @@
 
     &__link {
         padding: 8px;
+    }
+    .mobile &__link {
+        display: block;
+        width: 100%;
     }
 }
 

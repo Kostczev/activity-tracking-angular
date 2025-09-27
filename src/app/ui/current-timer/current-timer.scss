@@ -20,3 +20,24 @@
         font-weight: 600;
     }
 }
+
+@media (max-width: 768px) {
+    .current-activity {
+        align-items: start;
+        grid-template-areas: "name button"
+            "time button";
+        grid-template-columns: 1fr auto;
+        row-gap: 8px;
+
+        &__button {
+            grid-area: button;
+            margin-right: -4px;
+        }
+        &__duration {
+            grid-area: time;
+        }
+        &__name {
+            grid-area: name;
+        }
+    }
+}

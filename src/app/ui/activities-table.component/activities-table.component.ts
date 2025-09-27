@@ -12,6 +12,7 @@ import { DatePipe } from '@angular/common';
 })
 export class ActivitiesTableComponent {
   statisticSlots = input.required<StatisticSlot[]>()
+  showDates = input<boolean>(false)
   slots = computed(() => this.statisticSlots())
 
   private dataService = inject(DataService)
@@ -19,5 +20,4 @@ export class ActivitiesTableComponent {
 
   getClusterName = (clusterId: number) => this.dataService.getClusterName(clusterId)
   formatDuration = (duration: number) => this.dateFormatService.formatDuration(duration)
-  // getPercentageForDay = (duration: number) => this.dateFormatService.getPercentageForDays(duration)
 }
