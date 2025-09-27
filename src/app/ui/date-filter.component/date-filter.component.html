@@ -1,0 +1,11 @@
+<div class="quick-filters">
+    @for (filter of quickFilters; track filter.id) {
+    <button [class.active]="currentFilter === filter.id" (click)="changePeriod(filter)" class="button">
+        {{ filter.label }}
+    </button>
+    }
+
+    <!-- <button (click)="toggleCustomDatePicker()" [class.active]="showCustomPicker" class="filter-btn custom-date-btn">
+        📅
+    </button> -->
+</div>

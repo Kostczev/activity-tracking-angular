@@ -1,6 +1,11 @@
 @if (currentActivityName$ | async; as name) {
-<div>
-    {{ name }}: {{ currentDuration$ | async }}
-    <button (click)="stopActivity()">Stop</button>
+<div class="current-activity">
+    <div class="current-activity__name">
+        {{ name }}
+    </div>
+    <div class="current-activity__duration">
+        {{ currentDuration$ | async }}
+    </div>
+    <button class="current-activity__button cross-button" (click)="stopActivity()"></button>
 </div>
 }

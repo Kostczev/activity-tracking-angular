@@ -1,56 +1,45 @@
 import { Component } from '@angular/core';
 import { DataService } from '../../core/services/data.service';
-import { from, Observable, switchMap } from 'rxjs';
+import { BehaviorSubject, from, Observable, switchMap } from 'rxjs';
 import { StatisticSlot, TimeSlot } from '../../core/interfaces/db.interface';
 import { AsyncPipe } from '@angular/common';
 import { DateFormatService } from '../../core/services/date-format.service';
 import { ActivitiesTableComponent } from "../../ui/activities-table.component/activities-table.component";
+import { DateFilterComponent } from "../../ui/date-filter.component/date-filter.component";
 
 @Component({
   selector: 'app-statistics',
-  imports: [AsyncPipe, ActivitiesTableComponent],
+  imports: [AsyncPipe, ActivitiesTableComponent, DateFilterComponent],
   templateUrl: './statistics.html',
   styleUrl: './statistics.scss'
 })
 export class StatisticsComponent {
-  // clusters$: Observable<Cluster[]>
   todayStats$: Observable<any[]>
   statisticSlots$: Observable<StatisticSlot[]>
+  private dateRange$ = new BehaviorSubject<{ start: Date; end: Date; period: number }>({
+    start: new Date(new Date().setHours(0, 0, 0, 0)),
+    end: new Date(new Date().setHours(23, 59, 59, 999)),
+    period: 1
+  });
+  private period = 1;
+  onDateRangeChange(range: { start: Date; end: Date; period: number }): void {
+    this.dateRange$.next(range);
+  }
 
-  hours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24];
 
   constructor(
     private dataService: DataService,
     private dateFormatService: DateFormatService
   ) {
-    this.statisticSlots$ = this.dataService.getStatistic(new Date(), new Date())
+    this.statisticSlots$ = this.dateRange$.pipe(
+      switchMap(range => this.dataService.getStatistic(range.start, range.end))
+    )
     this.todayStats$ = this.statisticSlots$.pipe(
       switchMap(slots => from(this.calculateStats(slots)))
     )
-  }
-
-  getTimelinePosition(startTime: Date): number {
-    const start = new Date(startTime);
-    const dayStart = new Date(start);
-    dayStart.setHours(6, 0, 0, 0); // Начинаем день с 6 утра
-
-    const dayEnd = new Date(dayStart);
-    dayEnd.setHours(23, 0, 0, 0); // Заканчиваем в 23:00
-
-    const totalDayMs = dayEnd.getTime() - dayStart.getTime();
-    const positionMs = start.getTime() - dayStart.getTime();
-
-    return (positionMs / totalDayMs) * 100;
-  }
-  getTimeDetails(slot: StatisticSlot): string {
-    const start = new Date(slot.startTime);
-    const end = slot.endTime ? new Date(slot.endTime) : new Date();
-    const duration = slot.duration || 0;
-
-    return `С ${start.getHours()}:${this.padZero(start.getMinutes())} • ${this.formatDuration(duration)}`;
-  }
-  private padZero(num: number): string {
-    return num.toString().padStart(2, '0');
+    this.dateRange$.subscribe(range => {
+      this.period = range.period
+    })
   }
 
   private async calculateStats(slots: StatisticSlot[]): Promise<any[]> {
@@ -79,6 +68,5 @@ export class StatisticsComponent {
 
   formatDuration = (duration: number) => this.dateFormatService.formatDuration(duration)
 
-  getPercentageForDay = (duration: number) => this.dateFormatService.getPercentageForDay(duration)
-
+  getPercentageForDays = (duration: number) => this.dateFormatService.getPercentageForDays(duration, this.period)
 }

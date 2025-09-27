@@ -1,0 +1,37 @@
+.button {
+    background: var(--aquamarine-transparency-color);
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &.active {
+        background: var(--aquamarine-color);
+        color: var(--dark-color);
+    }
+    &:hover,
+    &:focus {
+        box-shadow: 0 0 10px 1px var(--aquamarine-color);
+    }
+}
+
+.cross-button {
+    cursor: pointer;
+    position: relative;
+    height: 24px;
+    width: 24px;
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        left: 2px;
+        height: 0;
+        box-shadow: 0 0 0 1px var(--aquamarine-color);
+    }
+    &::before {
+        transform: rotateZ(45deg);
+    }
+    &::after {
+        transform: rotateZ(-45deg);
+    }
+}

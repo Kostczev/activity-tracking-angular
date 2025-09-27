@@ -16,8 +16,8 @@ export class DateFormatService {
     return Math.abs(minutes % 1) < 0.1 ? minutes.toFixed(0) : minutes.toFixed(1);
   }
 
-  getPercentageForDay(durationMs: number): number {
-    const totalDayTime = 24 * 60 * 60 * 1000; // 24 часа в миллисекундах
+  getPercentageForDays(durationMs: number, countDays: number): number {
+    const totalDayTime = countDays * 24 * 60 * 60 * 1000; // 24 часа в миллисекундах
     const percentage = (durationMs / totalDayTime) * 100;
     return +percentage.toFixed(2);
   }

@@ -19,5 +19,5 @@ export class ActivitiesTableComponent {
 
   getClusterName = (clusterId: number) => this.dataService.getClusterName(clusterId)
   formatDuration = (duration: number) => this.dateFormatService.formatDuration(duration)
-  getPercentageForDay = (duration: number) => this.dateFormatService.getPercentageForDay(duration)
+  // getPercentageForDay = (duration: number) => this.dateFormatService.getPercentageForDays(duration)
 }

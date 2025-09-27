@@ -191,30 +191,30 @@ export class DataService {
     }
 
     getTimeSlotsForPeriod(startDate: Date, endDate: Date): Observable<TimeSlot[]> {
-        const startOfDay = new Date(startDate);
-        startOfDay.setHours(0, 0, 0, 0);
+        // const startOfDay = new Date(startDate);
+        // startOfDay.setHours(0, 0, 0, 0);
 
-        const endOfDay = new Date(endDate);
-        endOfDay.setHours(23, 59, 59, 999);
+        // const endOfDay = new Date(endDate);
+        // endOfDay.setHours(23, 59, 59, 999);
 
         return this.wrapLiveQuery(() =>
             db.timeSlots
                 .where('endTime')
-                .between(startOfDay, endOfDay)
+                .between(startDate, endDate)
+                // .between(startOfDay, endOfDay)
                 .toArray()
         )
     }
 
     getStatistic(startDate: Date, endDate: Date): Observable<StatisticSlot[]> {
         return this.getTimeSlotsForPeriod(startDate, endDate).pipe(
-            switchMap(slots => this.enrichSlotsWithActivities(slots))
+            switchMap(slots => this.enrichSlotsWithActivities(slots, startDate, endDate))
         );
     }
 
-    private enrichSlotsWithActivities(slots: TimeSlot[]): Observable<StatisticSlot[]> {
+    private enrichSlotsWithActivities(slots: TimeSlot[], periodStart: Date, periodEnd: Date): Observable<StatisticSlot[]> {
         // Группируем запросы по активности для оптимизации
         const activityRequests = new Map<number, Observable<Activity>>();
-        const clusterRequests = new Map<number, Observable<Cluster>>();
 
         const slotRequests = slots.map(slot => {
             if (!activityRequests.has(slot.activityId)) {
@@ -226,24 +226,68 @@ export class DataService {
                 // forkJoin ждет завершения ВСЕХ Observable'ов в массиве.
                 // Добавьте take(1) - это гарантирует, что каждый Observable эмитнет значение и завершится
                 take(1),
-                map(activity => ({
-                    timeSlotId: slot.id!,
-                    activityId: slot.activityId,
-                    activityName: activity?.name || 'Unknown',
-                    clusterId: activity?.clusterId || -1,
-                    startTime: slot.startTime,
-                    endTime: slot.endTime,
-                    duration: this.calculateSlotDuration(slot)
-                }))
+                map(activity => {
+                    const trimmedSlot = this.trimSlotToPeriod(slot, periodStart, periodEnd)
+
+                    return {
+                        timeSlotId: slot.id!,
+                        activityId: slot.activityId,
+                        activityName: activity?.name || 'Unknown',
+                        clusterId: activity?.clusterId || -1,
+                        // startTime: slot.startTime,
+                        // endTime: slot.endTime,
+                        startTime: trimmedSlot.startTime,
+                        endTime: trimmedSlot.endTime,
+                        duration: trimmedSlot.duration
+                        // duration: this.calculateSlotDuration(slot)
+                    }
+                })
             );
         });
 
-        return forkJoin(slotRequests);
+        // return forkJoin(slotRequests).pipe(
+        //     map(slots => slots.filter(slot => slot.duration > 0))
+        // )
+        return forkJoin(slotRequests)
     }
 
     calculateSlotDuration(slot: TimeSlot): number {
         return slot.endTime
             ? new Date(slot.endTime).getTime() - new Date(slot.startTime).getTime()
             : 0;
+    }
+    calculateDuration(startTime: Date, endTime: Date): number {
+        return new Date(endTime).getTime() - new Date(startTime).getTime()
+    }
+
+    private trimSlotToPeriod(slot: TimeSlot, periodStart: Date, periodEnd: Date): {
+        startTime: Date; endTime: Date; duration: number
+    } {
+        const slotEnd = slot.endTime || new Date();
+
+        // Если таймслот не пересекается с периодом - возвращаем нулевую длительность
+        // if (slotEnd <= periodStart || slot.startTime >= periodEnd) {
+        //     return {
+        //         startTime: slot.startTime,
+        //         endTime: slotEnd,
+        //         duration: 0
+        //     };
+        // }
+
+        // Обрезаем границы
+        const trimmedStart = slot.startTime < periodStart ? periodStart : slot.startTime;
+        const trimmedEnd = slotEnd > periodEnd ? periodEnd : slotEnd;
+
+        // const trimmedDuration = trimmedEnd.getTime() - trimmedStart.getTime();
+        const trimmedDuration = this.calculateDuration(trimmedStart, trimmedEnd)
+
+        return {
+            // startTime: slot.startTime,
+            startTime: trimmedStart,
+            endTime: slot.endTime!,
+            duration: this.calculateDuration(slot.startTime, slot.endTime!)
+            // endTime: trimmedEnd,
+            // duration: trimmedDuration
+        };
     }
 }

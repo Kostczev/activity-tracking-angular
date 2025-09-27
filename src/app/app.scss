@@ -1,10 +1,12 @@
 :host {
     display: block;
-    margin-top: 72px;
+    margin-top: 48px;
 }
 
 .main-content {
     padding-top: 24px;
+    position: relative;
+    padding-bottom: 120px;
 }
 
 .loading {

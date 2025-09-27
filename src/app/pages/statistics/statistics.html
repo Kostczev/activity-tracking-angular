@@ -1,4 +1,27 @@
 <h2 class="h2 mb24">Статистика</h2>
+<div class="filters-section mb32">
+  <app-date-filter-component (dateRangeChange)="onDateRangeChange($event)"></app-date-filter-component>
+
+  <!-- Календарь для произвольной даты -->
+  <!-- @if (showCustomPicker) {
+  <div class="custom-date-picker">
+    <div class="date-inputs">
+      <label>
+        С:
+        <input type="date" [value]="customStartDate | date:'yyyy-MM-dd'" 
+               (change)="onCustomDateChange($event, 'start')">
+      </label>
+      <label>
+        По:
+        <input type="date" [value]="customEndDate | date:'yyyy-MM-dd'"
+               (change)="onCustomDateChange($event, 'end')">
+      </label>
+      <button (click)="applyCustomDate()" class="apply-btn">Применить</button>
+    </div>
+  </div>
+  } -->
+</div>
+
 <div class="mb60">
     <div class="stats__wrapper">
         @for (stat of todayStats$ | async; track stat.activityName) {
@@ -6,9 +29,9 @@
             <div class="stats__name">{{ stat.activityName }}</div>
             <div class="stats__duration">{{ stat.duration }}</div>
             <div class="stats__bar">
-                <div class="stats__progress" [style.width.%]="getPercentageForDay(stat.durationMs)"></div>
+                <div class="stats__progress" [style.width.%]="getPercentageForDays(stat.durationMs)"></div>
             </div>
-            <div class="stats__percentage">{{ getPercentageForDay(stat.durationMs) }}%</div>
+            <div class="stats__percentage">{{ getPercentageForDays(stat.durationMs) }}%</div>
         </div>
         }
     </div>
