@@ -41,7 +41,7 @@
         &__row {
             padding: 16px;
             display: grid;
-            grid-template-columns: unset;
+            grid-template-columns: unset !important;
             grid-template-areas:
                 "activity activity activity"
                 "cluster cluster cluster"
