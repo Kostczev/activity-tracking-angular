@@ -21,6 +21,7 @@ export class SearchSelectComponent implements OnInit {
   selectedOption: any = null;
   isOpen = false;
 
+  focusedOptionIndex = -1;
   private searchSubject = new Subject<string>();
 
   ngOnInit() {
@@ -28,7 +29,6 @@ export class SearchSelectComponent implements OnInit {
       debounceTime(this.debounceTime),
       distinctUntilChanged()
     ).subscribe(term => {
-      // ВОТ ТУТ ВЫЗЫВАЕМ ФУНКЦИЮ ПОИСКА!
       this.options = this.searchFunction(term);
     });
   }
@@ -44,10 +44,8 @@ export class SearchSelectComponent implements OnInit {
   }
 
   onBlur() {
-    // Небольшая задержка чтобы успеть обработать клик по option
-    setTimeout(() => {
-      this.isOpen = false;
-    }, 10);
+    this.isOpen = false;
+    this.focusedOptionIndex = -1;
   }
 
   selectOption(option: any) {
@@ -62,5 +60,57 @@ export class SearchSelectComponent implements OnInit {
     this.searchTerm = '';
     this.isOpen = false;
     this.optionSelected.emit(null);
+    this.focusedOptionIndex = -1;
+  }
+
+
+  onKeyDown(event: KeyboardEvent) {
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.focusNextOption();
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        this.focusPreviousOption();
+        break;
+      case 'Enter':
+        event.preventDefault();
+        if (this.focusedOptionIndex >= 0) {
+          this.selectOption(this.options[this.focusedOptionIndex]);
+        }
+        break;
+      case 'Escape':
+        this.isOpen = false;
+        break;
+    }
+  }
+
+  private focusNextOption() {
+    this.focusedOptionIndex =
+      this.focusedOptionIndex >= this.options.length - 1
+        ? 0
+        : this.focusedOptionIndex + 1;
+    this.scrollToFocusedOption();
+  }
+
+  private focusPreviousOption() {
+    this.focusedOptionIndex =
+      this.focusedOptionIndex <= 0
+        ? this.options.length - 1
+        : this.focusedOptionIndex - 1;
+    this.scrollToFocusedOption();
+  }
+
+  private scrollToFocusedOption() {
+    setTimeout(() => {
+      const focusedElement = document.querySelector('.dropdown-option.focused') as HTMLElement;
+      if (focusedElement) {
+        focusedElement.scrollIntoView({
+          block: 'nearest',
+          behavior: 'smooth'
+        });
+      }
+    });
   }
 }

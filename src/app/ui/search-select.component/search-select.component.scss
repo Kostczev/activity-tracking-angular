@@ -41,13 +41,8 @@
   cursor: pointer;
   border-bottom: var(--light-border);
   
-  &:hover, &.focused {
+  &.focused, &:hover, &.focused {
     background: var(--aquamarine-transparency-30-color);
-  }
-  
-  &.selected {
-    background: #007bff;
-    color: white;
   }
   
   &:last-child {

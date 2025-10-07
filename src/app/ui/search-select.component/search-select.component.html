@@ -1,5 +1,5 @@
 <div class="search-select">
-  <input type="text" [(ngModel)]="searchTerm" (input)="onInputChange()" (focus)="onFocus()" (blur)="onBlur()" [placeholder]="placeholder"
+  <input type="text" [(ngModel)]="searchTerm" (input)="onInputChange()" (focus)="onFocus()" (blur)="onBlur()" (keydown)="onKeyDown($event)" [placeholder]="placeholder"
     class="input" [class.error]="hasError"/>
   @if (searchTerm) {
     <button class="cross-button search-select__cleare" (click)="clearOption()"></button>
@@ -7,8 +7,10 @@
 
   @if (isOpen && options.length > 0) {
   <div class="dropdown">
-    @for (option of options; track option.id) {
-    <div class="dropdown-option" (click)="selectOption(option)">
+    @for (option of options; track option.id; let i = $index) {
+    <div class="dropdown-option"
+      [class.focused]="i === focusedOptionIndex"
+      (mousedown)="selectOption(option)">
       {{ option.name }}
     </div>
     }
