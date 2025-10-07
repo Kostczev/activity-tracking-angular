@@ -1,0 +1,18 @@
+.input {
+    display: block;
+    width: 100%;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--aquamarine-transparency-30-color);
+    transition: all .3s ease;
+
+    &:hover,
+    &:focus {
+        border-color: var(--aquamarine-color);
+    }
+
+    &.error {
+        border-color: var(--crimson-color);
+    }
+}

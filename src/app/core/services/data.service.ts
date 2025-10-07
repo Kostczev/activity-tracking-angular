@@ -1,15 +1,13 @@
-import { DateFormatService } from './date-format.service';
 import { TimeSlot, Activity, Cluster, StatisticSlot } from './../interfaces/db.interface';
 import { db } from '../db';
 import { Injectable, OnInit } from '@angular/core';
 import { liveQuery } from 'dexie';
-import { catchError, forkJoin, from, map, Observable, of, shareReplay, switchMap, take, tap } from 'rxjs';
-import { Data } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { catchError, firstValueFrom, forkJoin, from, map, Observable, of, switchMap, take, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
     clustersCache = new Map<number, Cluster>();
+    private clustersArray: Cluster[] = []
     private clustersLoaded = false;
 
     constructor() {
@@ -72,28 +70,51 @@ export class DataService {
 
     // Основной метод для получения кластера
     getClusterById(clusterId: number): Observable<Cluster | null> {
-        // Если уже загружены - возвращаем из кеша
-        if (this.clustersLoaded) {
-            return of(this.clustersCache.get(clusterId) || null);
-        }
+        return of(this.clustersCache.get(clusterId) || null);
+    }
 
-        // Если еще не загружали - загружаем все и кешируем
-        return this.getAllClusters().pipe(
-            tap(clusters => this.cacheClusters(clusters)),
-            map(() => this.clustersCache.get(clusterId) || null)
-        );
+    getClustersArray(): Cluster[] {
+        return [...this.clustersArray]; // Возвращаем копию
+    }
+
+    searchClasters(searchTerm: string): Cluster[] {
+        if (!searchTerm) {
+            return this.getClustersArray()
+        }
+        const term = searchTerm.toLocaleLowerCase()
+
+        console.log(term)
+        
+        return this.clustersArray.filter(cluster => {
+            return cluster.name.toLocaleLowerCase().includes(term)
+        })
     }
 
     preloadClusters(): Observable<Cluster[]> {
         return this.getAllClusters().pipe(
             tap(clusters => {
-                clusters.forEach(cluster => {
-                    if (cluster.id) {
-                        this.clustersCache.set(cluster.id, cluster);
-                    }
-                });
+                // clusters.forEach(cluster => {
+                //     if (cluster.id) {
+                //         this.clustersCache.set(cluster.id, cluster);
+                //     }
+                // });
+                this.cacheClusters(clusters)
+                this.clustersLoaded = true
             })
         );
+    }
+
+    async isClusterNameUnique(name: string): Promise<boolean> {
+        try {
+            const exists = [...this.clustersCache.values()].some(cluster =>
+                cluster.name.toLowerCase() === name.toLowerCase().trim()
+            );
+            return !exists; // true если уникальное
+
+        } catch (error) {
+            console.error('Error checking cluster name uniqueness:', error);
+            return false; // В случае ошибки считаем что не уникально
+        }
     }
 
     getAllClusters(): Observable<Cluster[]> {
@@ -101,11 +122,19 @@ export class DataService {
     }
 
     private cacheClusters(clusters: Cluster[]): void {
+        this.clustersCache.clear()
+        this.clustersArray = clusters
+        this.clustersSort()
+
         clusters.forEach(cluster => {
             if (cluster.id) {
-                this.clustersCache.set(cluster.id, cluster);
+                this.clustersCache.set(cluster.id, cluster)
             }
         });
+    }
+
+    clustersSort() {
+        this.clustersArray.sort((a, b) => a.name.localeCompare(b.name));
     }
 
     // Вспомогательный метод для быстрого доступа
@@ -139,10 +168,31 @@ export class DataService {
 
     async addCluster(cluster: Omit<Cluster, 'id'>): Promise<number> {
         const newId = await db.clusters.add(cluster)
+
         if (newId === undefined) {
             throw new Error('Ошибка базы данных: не удалось добавить кластер, ID не получен.');
         }
+
+        const newCluster = { ...cluster, id: newId }
+        this.clustersCache.set(newId, newCluster)
+        this.clustersArray.push(newCluster)
+        this.clustersSort()
+
         return newId
+    }
+
+    async isActivityNameUnique(name: string, clusterId: number): Promise<boolean> {
+        try {
+            const activities = await firstValueFrom(this.getAllActivities());
+            const exists = activities.some(activity =>
+                activity.name.toLowerCase() === name.toLowerCase().trim() &&
+                activity.clusterId === clusterId
+            );
+            return !exists;
+        } catch (error) {
+            console.error('Error checking activity name uniqueness:', error);
+            return false;
+        }
     }
 
     async updateActivity(activity: Activity): Promise<void> {
@@ -262,7 +312,7 @@ export class DataService {
         // Обрезаем границы
         const trimmedStart = slot.startTime < periodStart ? periodStart : slot.startTime;
         const trimmedEnd = slotEnd > periodEnd ? periodEnd : slotEnd;
-        
+
         const trimmedDuration = this.calculateDuration(trimmedStart, trimmedEnd)
 
         return {

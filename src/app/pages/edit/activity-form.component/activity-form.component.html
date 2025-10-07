@@ -1,0 +1,35 @@
+<h3 class="h3 mb20">Создать новую активность</h3>
+
+<div class="input-group">
+    <input #nameInput type="text" [(ngModel)]="activityName" placeholder="Название активности"
+        (keyup.enter)="createActivity()" class="input" [class.error]="errorMessageFromActivity">
+</div>
+@if (errorMessageFromActivity) {
+<div class="error-message mb12">{{ errorMessageFromActivity }}</div>
+}
+
+<app-search-select [searchFunction]="searchClusters" [debounceTime]='0' placeholder="Выберите кластер..."
+    (optionSelected)="onClusterSelected($event)" [hasError]="!!errorMessageFromActivity"></app-search-select>
+@if (errorMessageFromCluster) {
+<div class="error-message">{{ errorMessageFromCluster }}</div>
+}
+
+@if (errorMessage) {
+<div class="error-message">{{ errorMessage }}</div>
+}
+@if (isLoading) {
+<div class="loading">Создание...</div>
+}
+@if (successMessage) {
+<div class="success-message">{{ successMessage }}</div>
+}
+
+<div class="buttons-wrapper">
+    <button (click)="createActivity()" class="button button--primary">
+        Создать
+    </button>
+
+    <button (click)="cancel.emit()" class="button">
+        Отмена
+    </button>
+</div>

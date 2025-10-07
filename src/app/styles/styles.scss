@@ -8,6 +8,7 @@
 @use 'wrap';
 @use 'table';
 @use 'button';
+@use 'inputs';
 
 :root {
   --dark-color: #000000;
@@ -22,7 +23,10 @@
   --message-color: #404040;
 
   --aquamarine-color: rgb(94 234 212);
-  --aquamarine-transparency-color: rgba(45, 212, 191, .1);
+  --aquamarine-transparency-30-color: rgba(45, 212, 191, .3);
+  --aquamarine-transparency-10-color: rgba(45, 212, 191, .1);
+
+  --crimson-color: rgba(220, 20, 60, 1);
 
   --light-border: 1px solid var(--light-color);
 
@@ -63,7 +67,7 @@ body {
 
 .skill-tag {
     color: var(--aquamarine-color);
-    background: var(--aquamarine-transparency-color);
+    background: var(--aquamarine-transparency-10-color);
     border-radius: 32px;
     padding: 8px 12px;
 

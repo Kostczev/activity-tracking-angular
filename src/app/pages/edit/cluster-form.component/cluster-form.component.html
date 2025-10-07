@@ -1,0 +1,28 @@
+<h3 class="h3 mb20">Создать новый кластер</h3>
+
+<div class="input-group">
+    <input #nameInput type="text" [(ngModel)]="clusterName" placeholder="Введите название кластера"
+        (keyup.enter)="createCluster()" class="input" [class.error]="errorMessage">
+
+    @if (errorMessage) {
+    <div class="error-message">{{ errorMessage }}</div>
+    }
+    @if (successMessage) {
+    <div class="success-message">{{ successMessage }}</div>
+    }
+
+    @if (isLoading) {
+    <div class="loading">Создание...</div>
+    }
+
+    <div class="buttons-wrapper">
+        <!-- [disabled]="!clusterName.trim()" -->
+        <button (click)="createCluster()" class="button button--primary">
+            Создать
+        </button>
+
+        <button (click)="cancel.emit()" class="button">
+            Отмена
+        </button>
+    </div>
+</div>

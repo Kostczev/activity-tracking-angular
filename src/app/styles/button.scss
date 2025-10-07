@@ -1,8 +1,12 @@
 .button {
-    background: var(--aquamarine-transparency-color);
+    background: var(--aquamarine-transparency-10-color);
     padding: 8px;
     border-radius: 4px;
     cursor: pointer;
+
+    &--primary {
+        background: var(--aquamarine-transparency-30-color);
+    }
 
     &.active {
         background: var(--aquamarine-color);
@@ -12,6 +16,12 @@
     &:focus {
         box-shadow: 0 0 10px 1px var(--aquamarine-color);
     }
+}
+
+.buttons-wrapper {
+    display: flex;
+    gap: 24px;
+    justify-content: end;
 }
 
 .cross-button {

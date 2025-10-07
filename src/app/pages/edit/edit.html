@@ -1,1 +1,24 @@
-<p>edit works!</p>
+<h2 class="h2 mb24">Управление данными</h2>
+<div class="action-buttons mb24">
+    <button (click)="toggleClusterForm()" [class.active]="showClusterForm" class="button">
+        {{ showClusterForm ? '✕' : '➕' }} Кластеры
+    </button>
+
+    <!-- button--toggle -->
+    <button (click)="toggleActivityForm()" [class.active]="showActivityForm" class="button">
+        {{ showActivityForm ? '✕' : '➕' }} Активности
+    </button>
+</div>
+
+<div class="forms-wrapper">
+    @if (showClusterForm) {
+    <app-cluster-form-component (success)="onFormSuccess('cluster')" (cancel)="showClusterForm = false">
+    </app-cluster-form-component>
+    }
+    
+    @if (showActivityForm) {
+    <app-activity-form-component (success)="onFormSuccess('activity')"
+        (cancel)="showActivityForm = false">
+    </app-activity-form-component>
+    }
+</div>

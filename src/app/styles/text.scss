@@ -15,3 +15,13 @@
 .text-light-transparent {
   color: var(--light-transparent-color);
 }
+
+.error-message {
+  color: var(--crimson-color);
+  font-weight: 600;
+}
+
+.success-message {
+  color: var(--aquamarine-color);
+  font-weight: 600;
+}
